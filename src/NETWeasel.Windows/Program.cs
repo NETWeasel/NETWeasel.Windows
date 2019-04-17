@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace NETWeasel.Windows
 {
@@ -79,31 +80,35 @@ namespace NETWeasel.Windows
             return 0;
         }
 
-        private static void Package(string artifactsPath, string outputPath)
+        private static void Package(string artifactsPath, string desiredOutputDir)
         {
             // Get location for NETWeasel
             var weaselDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var generatedOutputPath = Path.Combine(outputPath, "RELEASE");
+            var outputDir = Path.Combine(desiredOutputDir, "RELEASE");
 
-            if (!Directory.Exists(generatedOutputPath))
+            if (!Directory.Exists(outputDir))
             {
-                Directory.CreateDirectory(generatedOutputPath);
+                Directory.CreateDirectory(outputDir);
             }
 
             // Run heat do we get a file for all files that we need
             // to include in the WIX installer
-            RunHeat(weaselDir, artifactsPath, generatedOutputPath);
+            var sourceFilesWxsPath = RunHeat(weaselDir, artifactsPath, outputDir);
 
             // Compose the WXS for Wix to pass to candle
-            var wxsPath = ComposeWxs(weaselDir, generatedOutputPath);
+            var productWxsPath = ComposeProductWxs(weaselDir, outputDir);
 
-            CleanUp(wxsPath);
+            RunCandle(weaselDir, productWxsPath, sourceFilesWxsPath, outputDir);
+
+            CleanUpFiles(productWxsPath, sourceFilesWxsPath);
         }
 
-        private static void RunHeat(string weaselDir, string artifactsPath, string outputPath)
+        private static string RunHeat(string weaselDir, string artifactsPath, string outputDir)
         {
             // Traverse to the tools folder
             var heatPath = Path.Combine(weaselDir, "tools", "heat.exe");
+
+            var generatedFilePath = Path.Combine(outputDir, "SourceFiles.wxs");
 
             // Start heat, and generate the wxs for WIX
             // ARGS:
@@ -113,14 +118,21 @@ namespace NETWeasel.Windows
             // template Template for the generated output
             // out Target directory/file
             // nologo Prevents printing heat logo/info to console
-            Process.Start(heatPath, $"dir \"{artifactsPath}\" -gg -sfrag -template fragment -out {outputPath}\\directory.wxs -nologo");
+            Process.Start(heatPath, $"dir \"{artifactsPath}\" -gg -sfrag -template fragment -out \"{generatedFilePath}\" -nologo");
+
+            return generatedFilePath;
         }
 
-        private static string ComposeWxs(string weaselDir, string outputPath)
+        private static string ComposeProductWxs(string weaselDir, string outputDir)
         {
             const string TEMPLATE_FILE = "Product.wxs";
 
-            var specPath = Path.Combine(outputPath, "spec.xml");
+            var specPath = Path.Combine(outputDir, "spec.xml");
+
+            if (!File.Exists(specPath))
+            {
+                throw new InvalidOperationException("Cannot compose WXS with missing NETWeasel Spec file, ensure spec.xml exists");
+            }
 
             var specification = SpecificationParser.Deserialize(specPath);
 
@@ -133,21 +145,35 @@ namespace NETWeasel.Windows
                 .Replace("#{UPGRADE_GUID}#", "{" + specification.UpgradeId + "}")
                 .Compose();
 
-            var generatedFileName = Guid.NewGuid().ToString("N");
-
-            var generatedFilePath = Path.Combine(outputPath, generatedFileName + ".wxs");
+            var generatedFilePath = Path.Combine(outputDir, "Product.wxs");
 
             File.WriteAllText(generatedFilePath, composedWxs);
 
             return generatedFilePath;
         }
 
-        private static void CleanUp(string generatedWxsFilePath)
+        private static void RunCandle(string weaselDir, 
+            string productWxsPath,
+            string sourceFilesWxsPath,
+            string outputDir)
         {
-            if (!string.IsNullOrWhiteSpace(generatedWxsFilePath)
-            && File.Exists(generatedWxsFilePath))
+            var candlePath = Path.Combine(weaselDir, "tools", "candle.exe");
+
+            var productFileOutputPath = Path.Combine(outputDir, "Product.wixobj");
+            Process.Start(candlePath, $"-out \"{productFileOutputPath}\" \"{productWxsPath}\"");
+
+            var sourceFilesFileOutputPath = Path.Combine(outputDir, "SourceFiles.wixobj");
+            Process.Start(candlePath, $"-out \"{sourceFilesFileOutputPath}\" \"{sourceFilesWxsPath}\"");
+        }
+
+        private static void CleanUpFiles(params string[] paths)
+        {
+            foreach (var path in paths)
             {
-                File.Delete(generatedWxsFilePath);
+                if(string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                    continue;
+                
+                File.Delete(path);
             }
         }
     }

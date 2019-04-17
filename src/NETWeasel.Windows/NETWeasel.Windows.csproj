@@ -10,6 +10,12 @@
     <None Update="template\Product.wxs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="tools\candle.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="tools\candle.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="tools\heat.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
