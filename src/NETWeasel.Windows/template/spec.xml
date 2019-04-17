@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<NETWeasel>
+    <Specification>
+      <ProductName>
+        My Application
+      </ProductName>
+
+      <ProductVersion>
+        1.0.0.0
+      </ProductVersion>
+
+      <ProductManufacturer>
+        My Application Inc.
+      </ProductManufacturer>
+
+      <ProductUpgradeGuid>
+        <!-- TODO Generate a new GUID and place here -->
+        <!-- Ensure this GUID never changes. Check it into source control. -->
+      </ProductUpgradeGuid>
+    </Specification>
+</NETWeasel>
