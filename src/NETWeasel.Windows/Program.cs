@@ -98,7 +98,10 @@ namespace NETWeasel.Windows
             // Compose the WXS for Wix to pass to candle
             var productWxsPath = ComposeProductWxs(weaselDir, outputDir);
 
-            RunCandle(weaselDir, productWxsPath, sourceFilesWxsPath, outputDir);
+            var sourceFilesObjPath = RunCandle(weaselDir, sourceFilesWxsPath, outputDir);
+            var productObjPath = RunCandle(weaselDir, productWxsPath, outputDir);
+
+            RunLight(weaselDir, productObjPath, sourceFilesObjPath, outputDir);
 
             CleanUpFiles(productWxsPath, sourceFilesWxsPath);
         }
@@ -152,18 +155,29 @@ namespace NETWeasel.Windows
             return generatedFilePath;
         }
 
-        private static void RunCandle(string weaselDir, 
-            string productWxsPath,
-            string sourceFilesWxsPath,
+        private static string RunCandle(string weaselDir, 
+            string wxsPath,
             string outputDir)
         {
             var candlePath = Path.Combine(weaselDir, "tools", "candle.exe");
 
-            var productFileOutputPath = Path.Combine(outputDir, "Product.wixobj");
-            Process.Start(candlePath, $"-out \"{productFileOutputPath}\" \"{productWxsPath}\"");
+            var fileName = Path.GetFileNameWithoutExtension(wxsPath);
 
-            var sourceFilesFileOutputPath = Path.Combine(outputDir, "SourceFiles.wixobj");
-            Process.Start(candlePath, $"-out \"{sourceFilesFileOutputPath}\" \"{sourceFilesWxsPath}\"");
+            var outputPath = Path.Combine(outputDir, fileName + ".wixobj");
+            Process.Start(candlePath, $"-out \"{outputPath}\" \"{wxsPath}\"");
+
+            return outputPath;
+        }
+
+        private static void RunLight(string weaselDir, 
+            string productObjPath,
+            string sourceFilesObjPath,
+            string outputDir)
+        {
+            var candlePath = Path.Combine(weaselDir, "tools", "light.exe");
+
+            var msiOutputPath = Path.Combine(outputDir, "Setup.msi");
+            Process.Start(candlePath, $"-b \"{outputDir}\" \"{productObjPath}\" \"{sourceFilesObjPath}\" -out \"{msiOutputPath}\"");
         }
 
         private static void CleanUpFiles(params string[] paths)
