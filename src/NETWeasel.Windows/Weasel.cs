@@ -22,7 +22,7 @@ namespace NETWeasel.Windows
 
         private static readonly string Introduction = $"{ASCII}\n                   {string.Format(STRAPLINE, VERSION)}";
 
-        private string _path;
+        private string _artifactsPath;
         private string _output;
         private string _specPath;
         private bool _hideNETWeaselLogo;
@@ -32,7 +32,7 @@ namespace NETWeasel.Windows
         {
             var options = new OptionSet
             {
-                {"path=", "Path to the artifacts/bin directory to package application with", param => _path = param },
+                {"path=", "Path to the artifacts/bin directory to package application with", param => _artifactsPath = param },
                 {"output=", "Output directory to place all NETWeasel-generated artifacts, includes .msi and .exe files", param => _output = param },
                 {"spec=", "Path to the specification for NETWeasel to package target application", param => _specPath = param },
                 {"nologo", "Hides NETWeasel ASCII when running", param => _hideNETWeaselLogo = true },
@@ -66,11 +66,11 @@ namespace NETWeasel.Windows
 
             // Run heat do we get a file for all files that we need
             // to include in the WIX installer
-            var sourceFilesWxsPath = RunHeat(weaselDir, _path, _output);
+            var sourceFilesWxsPath = RunHeat(weaselDir, _artifactsPath, _output);
 
             var sourceFilesObjPath = RunCandle(weaselDir, sourceFilesWxsPath, _output, new Dictionary<string, string>
             {
-                ["ProductArtifactsDir"] = _path
+                ["ProductArtifactsDir"] = _artifactsPath
             });
 
             var productWxsPath = CreateProductWxs(weaselDir, _output);
@@ -87,11 +87,14 @@ namespace NETWeasel.Windows
 
             if (!_preventNETWeaselCleanup)
             {
-                CleanUpFiles(productWxsPath, sourceFilesWxsPath);
+                CleanUpFiles(productWxsPath, 
+                    sourceFilesWxsPath, 
+                    productObjPath, 
+                    sourceFilesObjPath);
             }
         }
 
-        private string CreateProductWxs(string weaselDir, string outputDir)
+        private static string CreateProductWxs(string weaselDir, string outputDir)
         {
             const string TEMPLATE_FILE = "Product.wxs";
             var wxsTemplatePath = Path.Combine(weaselDir, "template", TEMPLATE_FILE);
@@ -103,7 +106,7 @@ namespace NETWeasel.Windows
             return generatedFilePath;
         }
 
-        private string RunHeat(string weaselDir, string artifactsPath, string outputDir)
+        private static string RunHeat(string weaselDir, string artifactsPath, string outputDir)
         {
             // Traverse to the tools folder
             var heatPath = Path.Combine(weaselDir, "tools", "heat.exe");
@@ -112,20 +115,27 @@ namespace NETWeasel.Windows
 
             // Start heat, and generate the wxs for WIX
             // ARGS:
-            // dir Harvests an entire directory
-            // gg Generates guids for components
-            // sfrag Suppress generation of fragments for directories and components.
-            // template Template for the generated output
+            // dir Switches Heat to "harvest" an entire directory, in this case the artifacts directory
+            // dr Gives the ID to the generated output, to be referenced in the Product WXS file
+            // var Adds variable for the source directory, to be substituted by Candle.exe
+            // gg Generates guids for components at the point of harvest
+            // cg Gives the ID to the generated output, to be referenced in the Product WXS file
+            // sfrag Suppress generation of fragments for directories and components
+            // ke Include directories which are empty
+            // srd Prevent root directory from being harvested
             // out Target directory/file
             // nologo Prevents printing heat logo/info to console
             var heatProc = Process.Start(heatPath, $"dir \"{artifactsPath}\" -dr INSTALLFOLDER -var var.ProductArtifactsDir -gg -cg NETWeaselFragment -ke -srd -sfrag -out \"{generatedFilePath}\" -nologo");
 
             heatProc?.WaitForExit();
 
+            if (heatProc?.ExitCode != 0)
+                throw new WixException("Failed harvesting artifacts directory, check output to diagnose");
+
             return generatedFilePath;
         }
 
-        private Specification GetSpecification(string specificationPath)
+        private static Specification GetSpecification(string specificationPath)
         {
             if (!File.Exists(specificationPath))
             {
@@ -135,7 +145,7 @@ namespace NETWeasel.Windows
             return SpecificationParser.Deserialize(specificationPath);
         }
 
-        private string RunCandle(string weaselDir,
+        private static string RunCandle(string weaselDir,
             string wxsPath,
             string outputDir,
             Dictionary<string, string> wixVariables)
@@ -151,10 +161,13 @@ namespace NETWeasel.Windows
 
             candleProc?.WaitForExit();
 
+            if (candleProc?.ExitCode != 0)
+                throw new WixException($"Failed compiling WIX objects for {fileName}, check output to diagnose");
+
             return outputPath;
         }
 
-        private void RunLight(string weaselDir,
+        private static void RunLight(string weaselDir,
             string productObjPath,
             string sourceFilesObjPath,
             string outputDir)
@@ -165,9 +178,12 @@ namespace NETWeasel.Windows
             var lightProc = Process.Start(lightPath, $"-b \"{outputDir}\" \"{productObjPath}\" \"{sourceFilesObjPath}\" -out \"{msiOutputPath}\"");
 
             lightProc?.WaitForExit();
+
+            if (lightProc?.ExitCode != 0)
+                throw new WixException($"Failed linking to MSI, check output to diagnose");
         }
 
-        private void CleanUpFiles(params string[] paths)
+        private static void CleanUpFiles(params string[] paths)
         {
             foreach (var path in paths)
             {
