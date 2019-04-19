@@ -34,6 +34,9 @@
     <None Update="tools\wconsole.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="tools\winterop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="tools\wix.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
