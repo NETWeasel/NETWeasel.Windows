@@ -4,6 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
+using SharpCompress.Writers;
 
 namespace NETWeasel.Windows
 {
@@ -57,10 +62,7 @@ namespace NETWeasel.Windows
             // Get location for NETWeasel
             var weaselDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            if (!Directory.Exists(_output))
-            {
-                Directory.CreateDirectory(_output);
-            }
+            Directory.CreateDirectory(_output);
 
             var specification = GetSpecification(_specPath);
 
@@ -85,13 +87,42 @@ namespace NETWeasel.Windows
 
             RunLight(weaselDir, productObjPath, sourceFilesObjPath, _output);
 
+            CreateUpdatePackage(_artifactsPath, _output, specification.ProductVersion);
+
             if (!_preventNETWeaselCleanup)
             {
-                CleanUpFiles(productWxsPath, 
-                    sourceFilesWxsPath, 
-                    productObjPath, 
+                CleanUpFiles(productWxsPath,
+                    sourceFilesWxsPath,
+                    productObjPath,
                     sourceFilesObjPath);
             }
+        }
+
+        private static void CreateUpdatePackage(string artifactsDir,
+            string outputDir,
+            string productVersion)
+        {
+            var updateDir = Path.Combine(outputDir, "Update-ToZip");
+
+            Directory.CreateDirectory(updateDir);
+
+            FileHelper.CopyDirectory(artifactsDir, updateDir);
+
+            using (var stream = File.OpenWrite(Path.Combine(outputDir, productVersion + ".tar.lz")))
+            {
+                var writerOptions = new WriterOptions(CompressionType.LZip)
+                {
+                    LeaveStreamOpen = true,
+                    ArchiveEncoding = { Default = Encoding.GetEncoding(866) },
+                };
+
+                using (var writer = WriterFactory.Open(stream, ArchiveType.Tar, writerOptions))
+                {
+                    writer.WriteAll(updateDir, "*", SearchOption.AllDirectories);
+                }
+            }
+
+            Directory.Delete(updateDir, true);
         }
 
         private static string CreateProductWxs(string weaselDir, string outputDir)
