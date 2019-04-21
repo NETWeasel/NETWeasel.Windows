@@ -30,7 +30,5 @@ namespace NETWeasel.Windows
                 CopyAll(subDir, nextTargetSubDir);
             }
         }
-
-        // Output will vary based on the contents of the source directory.
     }
 }

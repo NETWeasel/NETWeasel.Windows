@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NETWeasel.Common\NETWeasel.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="template\Product.wxs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -2,11 +2,11 @@
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace NETWeasel.Windows
+namespace NETWeasel.Common
 {
-    internal static class SpecificationParser
+    public static class SpecificationParser
     {
-        internal static Specification Deserialize(string path)
+        public static Specification Deserialize(string path)
         {
             if(string.IsNullOrWhiteSpace(path))
                 throw new ArgumentNullException(nameof(path));
@@ -67,7 +67,7 @@ namespace NETWeasel.Windows
         public string ProductUpgradeGuid { get; set; }
     }
 
-    internal class Specification
+    public class Specification
     {
         internal Specification(string productName, string productVersion,
             string productManufacturer, Guid upgradeId)
@@ -78,9 +78,9 @@ namespace NETWeasel.Windows
             UpgradeId = upgradeId;
         }
 
-        internal string ProductName { get; }
-        internal string ProductVersion { get; }
-        internal string ProductManufacturer { get; }
-        internal Guid UpgradeId { get; }
+        public string ProductName { get; }
+        public string ProductVersion { get; }
+        public string ProductManufacturer { get; }
+        public Guid UpgradeId { get; }
     }
 }
