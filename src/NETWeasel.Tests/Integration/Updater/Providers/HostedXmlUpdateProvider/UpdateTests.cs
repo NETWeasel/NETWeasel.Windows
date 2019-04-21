@@ -22,7 +22,7 @@ namespace NETWeasel.Tests.Integration.Updater.Providers.HostedXmlUpdateProvider
             var updater = new NETWeasel.Updater.Updater(
                 new NETWeasel.Updater.Providers.HostedXmlUpdateProvider("http://localhost"));
 
-            await updater.Update(progresser);
+            await updater.Update(progress:progresser);
         }
     }
 }

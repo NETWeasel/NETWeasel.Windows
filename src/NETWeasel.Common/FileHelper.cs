@@ -1,11 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
-namespace NETWeasel.Packager
+namespace NETWeasel.Common
 {
-    internal static class FileHelper
+    public static class FileHelper
     {
-        internal static void CopyDirectory(string sourceDirectory, string targetDirectory)
+        public static void CopyDirectory(string sourceDirectory, string targetDirectory)
         {
             var sourceDirInfo = new DirectoryInfo(sourceDirectory);
             var targetDirInfo = new DirectoryInfo(targetDirectory);
@@ -17,11 +16,9 @@ namespace NETWeasel.Packager
         {
             Directory.CreateDirectory(target.FullName);
 
-            foreach (var fi in source.GetFiles())
+            foreach (var file in source.GetFiles())
             {
-                Console.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
-
-                fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                file.CopyTo(Path.Combine(target.FullName, file.Name), true);
             }
 
             foreach (var subDir in source.GetDirectories())
