@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace NETWeasel.Windows
+namespace NETWeasel.Packager
 {
     internal static class FileHelper
     {

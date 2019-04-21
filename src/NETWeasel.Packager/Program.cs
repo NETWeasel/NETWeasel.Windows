@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NETWeasel.Windows
+namespace NETWeasel.Packager
 {
     internal class Program
     {

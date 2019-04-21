@@ -43,7 +43,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using MessageLocalizerConverter = System.Converter<string, string>;
 
-namespace NETWeasel.Windows
+namespace NETWeasel.Common
 {
     static class StringCoda
     {

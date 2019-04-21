@@ -9,7 +9,7 @@ using NETWeasel.Common;
 using SharpCompress.Common;
 using SharpCompress.Writers;
 
-namespace NETWeasel.Windows
+namespace NETWeasel.Packager
 {
     internal class Weasel
     {
@@ -111,7 +111,7 @@ namespace NETWeasel.Windows
             {
                 var writerOptions = new WriterOptions(CompressionType.LZip)
                 {
-                    LeaveStreamOpen = true,
+                    LeaveStreamOpen = false,
                     ArchiveEncoding = { Default = Encoding.GetEncoding(866) },
                 };
 

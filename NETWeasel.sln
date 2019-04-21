@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NETWeasel.Windows", "src\NETWeasel.Windows\NETWeasel.Windows.csproj", "{1AF8DB54-C4F9-4ECF-83F8-8CC5EA84594D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NETWeasel.Packager", "src\NETWeasel.Packager\NETWeasel.Packager.csproj", "{1AF8DB54-C4F9-4ECF-83F8-8CC5EA84594D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NETWeasel.Updater", "src\NETWeasel.Updater\NETWeasel.Updater.csproj", "{94C663CE-790C-4484-A4BE-045AB373F42B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NETWeasel.Common", "src\NETWeasel.Common\NETWeasel.Common.csproj", "{9873A24E-363A-4597-946A-86B339EB2FB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NETWeasel.Tests", "src\NETWeasel.Tests\NETWeasel.Tests.csproj", "{4E1D3100-0F7D-41D6-8FC6-E67C205621D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NETWeasel.Tests", "src\NETWeasel.Tests\NETWeasel.Tests.csproj", "{4E1D3100-0F7D-41D6-8FC6-E67C205621D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

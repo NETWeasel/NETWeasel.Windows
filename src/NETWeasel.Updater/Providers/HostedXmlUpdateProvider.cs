@@ -51,18 +51,20 @@ namespace NETWeasel.Updater.Providers
             return new UpdateMeta(isUpdateAvailable, deserialized.ProductVersion);
         }
 
-        public async Task Update(IProgress<double> progress = default)
+        public async Task<string> DownloadUpdate(IProgress<double> progress = default)
         {
             var updateCheck = await CheckForUpdate();
 
             if (!updateCheck.IsUpdateAvailable)
-                return;
+                return null;
 
             var expectedRemoteFileName = updateCheck.Version + ".tar.lz";
 
             var url = BuildUrl(expectedRemoteFileName);
 
             await _httpClient.DownloadAsync(url, expectedRemoteFileName, progress);
+
+            return expectedRemoteFileName;
         }
 
         private string BuildUrl(string path)
