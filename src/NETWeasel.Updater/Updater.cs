@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using NETWeasel.Updater.Providers;
 
 namespace NETWeasel.Updater
@@ -14,6 +15,6 @@ namespace NETWeasel.Updater
 
         public Task<UpdateMeta> CheckForUpdate() => _updateProvider.CheckForUpdate();
 
-        public Task Update() => _updateProvider.Update();
+        public Task Update(IProgress<double> progress = default) => _updateProvider.Update(progress);
     }
 }

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using NETWeasel.Common;
+using NETWeasel.Updater.Extensions;
 
 namespace NETWeasel.Updater.Providers
 {
@@ -14,7 +15,7 @@ namespace NETWeasel.Updater.Providers
 
         public HostedXmlUpdateProvider(string updateUrl) : this(updateUrl, new HttpClient())
         {
-            
+
         }
 
         public HostedXmlUpdateProvider(string updateUrl, HttpClient httpClient)
@@ -31,13 +32,16 @@ namespace NETWeasel.Updater.Providers
 
             var updateFilePath = Guid.NewGuid() + ".xml";
 
+            // To be able to deserialize XML, we need a "temporary" file
+            // so save the response to disk, deserialize and then
+            // delete the file from the user's machine
             File.WriteAllText(updateFilePath, response);
 
             var deserialized = SpecificationParser.Deserialize(updateFilePath);
 
             File.Delete(updateFilePath);
 
-            var currentVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();
+            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             var currentParsedVersion = new Version(currentVersion);
             var remoteParsedVersion = new Version(deserialized.ProductVersion);
@@ -47,25 +51,18 @@ namespace NETWeasel.Updater.Providers
             return new UpdateMeta(isUpdateAvailable, deserialized.ProductVersion);
         }
 
-        public async Task Update(IProgress<int> progress = default)
+        public async Task Update(IProgress<double> progress = default)
         {
             var updateCheck = await CheckForUpdate();
 
-            if (updateCheck.IsUpdateAvailable)
+            if (!updateCheck.IsUpdateAvailable)
                 return;
 
             var expectedRemoteFileName = updateCheck.Version + ".tar.lz";
 
             var url = BuildUrl(expectedRemoteFileName);
 
-            var response = await _httpClient.GetAsync(url);
-
-            using (var file = new FileStream(expectedRemoteFileName, FileMode.Create))
-            {
-                await response.Content.CopyToAsync(file);
-            }
-
-            progress?.Report(100);
+            await _httpClient.DownloadAsync(url, expectedRemoteFileName, progress);
         }
 
         private string BuildUrl(string path)

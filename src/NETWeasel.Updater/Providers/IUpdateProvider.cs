@@ -6,6 +6,6 @@ namespace NETWeasel.Updater.Providers
     public interface IUpdateProvider
     {
         Task<UpdateMeta> CheckForUpdate();
-        Task Update(IProgress<int> progress = default);
+        Task Update(IProgress<double> progress = default);
     }
 }
