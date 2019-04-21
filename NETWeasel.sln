@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NETWeasel.Common", "src\NET
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NETWeasel.Tests", "src\NETWeasel.Tests\NETWeasel.Tests.csproj", "{4E1D3100-0F7D-41D6-8FC6-E67C205621D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NETWeasel.Updater.FX", "src\NETWeasel.Updater.FX\NETWeasel.Updater.FX.csproj", "{2A9FD6DD-73B0-4481-A8F9-5809037F549D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{4E1D3100-0F7D-41D6-8FC6-E67C205621D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E1D3100-0F7D-41D6-8FC6-E67C205621D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E1D3100-0F7D-41D6-8FC6-E67C205621D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A9FD6DD-73B0-4481-A8F9-5809037F549D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A9FD6DD-73B0-4481-A8F9-5809037F549D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A9FD6DD-73B0-4481-A8F9-5809037F549D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A9FD6DD-73B0-4481-A8F9-5809037F549D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

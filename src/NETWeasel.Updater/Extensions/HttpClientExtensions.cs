@@ -9,7 +9,8 @@ namespace NETWeasel.Updater.Extensions
 
     internal static class HttpClientExtensions
     {
-        internal static async Task DownloadAsync(this HttpClient client, string downloadUrl, string destinationFilePath, IProgress<double> progresser = default)
+        internal static async Task DownloadAsync(this HttpClient client, 
+            string downloadUrl, string destinationFilePath, IProgress<double> progresser = default)
         {
             using (var response = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead))
             {

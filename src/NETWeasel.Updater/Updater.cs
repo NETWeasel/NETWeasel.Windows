@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -60,14 +61,21 @@ namespace NETWeasel.Updater
                 }
             }
 
-            var installLocation = Assembly.GetExecutingAssembly().Location;
+            var installLocation = Assembly.GetEntryAssembly().Location;
 
-            var updaterPath = Path.Combine(updatePath, "tools", "NETWeasel.Updater.exe");
-            var updaterProcess = Process.Start(updaterPath, $"-path=\"{installLocation}\"");
-            updaterProcess?.WaitForExit();
+            var args = new Dictionary<string, string>
+            {
+                ["mode"] = "update",
+                ["path"] = installLocation,
+                ["cleanupPath"] = updatePath,
+            };
 
-            // Clean up the temporary directory, leave no trace
-            Directory.Delete(updatePath, true);
+            if (restartOnUpdate)
+            {
+                args.Add("restartApp", string.Empty);
+            }
+
+            UpdateHelper.StartUpdater(updatePath, args);
         }
     }
 }
