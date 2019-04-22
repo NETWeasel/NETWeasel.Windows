@@ -19,6 +19,29 @@ namespace NETWeasel.Updater
             _updateProvider = updateProvider;
         }
 
+        public bool UpdateNeedsElevation()
+        {
+            var fileName = Guid.NewGuid().ToString("D");
+
+            try
+            {
+                using (File.Create(fileName))
+                {
+                    // Attempt to create a file
+                }
+
+                // Clean up the file if we've
+                // successfully created with it
+                File.Delete(fileName);
+
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return true;
+            }
+        }
+
         public Task<UpdateMeta> CheckForUpdate() => _updateProvider.CheckForUpdate();
 
         public async Task Update(bool restartOnUpdate = true, IProgress<double> progress = default)
@@ -30,6 +53,8 @@ namespace NETWeasel.Updater
                 // TODO There should probably be an error here?
                 return;
             }
+
+            var runElevated = UpdateNeedsElevation();
 
             // Get a temporary path to extract the update to, we'll
             // be using this to start the updater and copy the files
@@ -74,7 +99,12 @@ namespace NETWeasel.Updater
                 args.Add("restartApp", string.Empty);
             }
 
-            UpdateHelper.StartUpdater(updatePath, args);
+            if (runElevated)
+            {
+                args.Add("elevated", string.Empty);
+            }
+
+            UpdateHelper.StartUpdater(updatePath, args, runElevated);
         }
     }
 }

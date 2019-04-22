@@ -88,6 +88,12 @@ namespace NETWeasel.Packager
 
             CreateUpdatePackage(_artifactsPath, _output, specification.ProductVersion);
 
+            var specFileName = Path.GetFileName(_specPath);
+
+            var copiedSpecFilePath = Path.Combine(_output, specFileName);
+
+            File.Copy(_specPath, copiedSpecFilePath, true);
+
             if (!_preventNETWeaselCleanup)
             {
                 CleanUpFiles(productWxsPath,
@@ -205,7 +211,7 @@ namespace NETWeasel.Packager
             var lightPath = Path.Combine(weaselDir, "tools", "light.exe");
 
             var msiOutputPath = Path.Combine(outputDir, "Setup.msi");
-            var lightProc = Process.Start(lightPath, $"-b \"{outputDir}\" \"{productObjPath}\" \"{sourceFilesObjPath}\" -out \"{msiOutputPath}\"");
+            var lightProc = Process.Start(lightPath, $"-b \"{outputDir}\" \"{productObjPath}\" \"{sourceFilesObjPath}\" -out \"{msiOutputPath}\" -spdb");
 
             lightProc?.WaitForExit();
 

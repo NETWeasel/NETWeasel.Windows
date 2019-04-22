@@ -30,7 +30,9 @@ namespace NETWeasel.Updater.Providers
 
             var response = await _httpClient.GetStringAsync(url);
 
-            var updateFilePath = Guid.NewGuid() + ".xml";
+            var tempPath = Path.GetTempPath();
+
+            var updateFilePath = Path.Combine(tempPath, Guid.NewGuid() + ".xml");
 
             // To be able to deserialize XML, we need a "temporary" file
             // so save the response to disk, deserialize and then
@@ -58,7 +60,9 @@ namespace NETWeasel.Updater.Providers
             if (!updateCheck.IsUpdateAvailable)
                 return null;
 
-            var expectedRemoteFileName = updateCheck.Version + ".tar.lz";
+            var tempPath = Path.GetTempPath();
+
+            var expectedRemoteFileName = Path.Combine(tempPath, updateCheck.Version + ".tar.lz");
 
             var url = BuildUrl(expectedRemoteFileName);
 

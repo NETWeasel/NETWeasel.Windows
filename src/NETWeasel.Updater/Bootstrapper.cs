@@ -15,6 +15,7 @@ namespace NETWeasel.Updater
         private bool _restartApp;
         private string _cleanupPath;
         private bool _verbose;
+        private bool _elevated;
 
         internal void Run(IEnumerable<string> args)
         {
@@ -27,6 +28,7 @@ namespace NETWeasel.Updater
                 {"path=", "Install path of application being bootstrapped", param => _installPath = param },
                 {"cleanupPath=", "Path to cleanup in cleanup mode", param => _cleanupPath = param },
                 {"restartApp", "Switch to automatically start application after bootstrapper is done", param => _restartApp = true },
+                {"elevated", param => _elevated = true },
                 {"verbose", param => _verbose = true },
             };
 
@@ -77,7 +79,7 @@ namespace NETWeasel.Updater
             {
                 ["mode"] = "cleanup",
                 ["cleanupPath"] = _cleanupPath,
-            });
+            }, _elevated);
 
             if (_restartApp)
             {
