@@ -6,11 +6,16 @@ namespace NETWeasel.Updater.FX
     {
         private static int Main(string[] args)
         {
-            Console.ReadLine();
-
-            var bootstrapper = new Bootstrapper();
-
-            bootstrapper.Run(args);
+            try
+            {
+                var bootstrapper = new Bootstrapper();
+                bootstrapper.Run(args);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return 1;
+            }
 
             return 0;
         }
