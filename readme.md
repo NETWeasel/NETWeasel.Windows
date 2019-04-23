@@ -12,9 +12,9 @@ The feature set describes what we need to achieve for us to consider a first rel
 
 We'll update this feature set periodically, and it is therefore subject to change at any moment. We're not defining any concrete dates, as this project is being driven by two full time employed software developers who are building NETWeasel in their spare time.
 
-- NETWeasel.Windows
-	- A Nuget package to add a .NET Core console application which will enable developers to package any application into an `.msi` and `.exe` installer/setup file and archive for update purposes.
-- NETWeasel.Updater
+- NETWeasel.Packager
+	- A application enabling developers to package any application into an `.msi` and `.exe` installer/setup file and archive for update purposes.
+- NETWeasel.Updater (.NET Framework variant)
 	-  A Nuget package to enable updates when an application runs. Much like `Squirrel.Windows`.
 
 ## NETWeasel.Windows
@@ -27,11 +27,11 @@ Clone the repo
 git clone https://github.com/NETWeasel/NETWeasel.Windows
 ```
 
-Down the [.NET Core 2.2 SDK](https://dotnet.microsoft.com/download) and if you're using Visual Studio, you'll need Visual Studio 2019 for the latest .NET Core support.
+Download the [.NET Core 2.2 SDK](https://dotnet.microsoft.com/download) and if you're using Visual Studio, you'll need Visual Studio 2019 for the latest .NET Core support.
 
-At this point, `NETWeasel.Windows` is ready to run, but it requires arguments to be fed to run the relevant package process. You can achieve this in Visual Studio by opening the debug properties in the project properties and adding `Application arguments`.
+At this point, `NETWeasel.Packager` is ready to run, but it requires arguments to be fed to run the relevant package process. You can achieve this in Visual Studio by opening the debug properties in the project properties and adding `Application arguments`.
 
-`NETWeasel.Windows` has several arguments it accepts at this point in time:
+`NETWeasel.Packager` has several arguments it accepts at this point in time:
 
 - `path` is required and specifies the directory of the artifacts folder of your application, typically the `debug` or `release` folder in the `bin` of your project you're intending to release.
 - `output` is required and specifies the target directory for where NETWeasel will place the packaged artifacts (msi/exe/archives)
@@ -54,12 +54,12 @@ In future major updates, we may be looking at moving away from the WIX dependenc
 
 ### What it does
 
-The entry point for `NETWeasel.Windows` is in `Program.cs` which instantiates a new `Weasel` - this is the runner responsible for orchestrating WIX dependencies.
+The entry point for `NETWeasel.Packager` is in `Program.cs` which instantiates a new `Weasel` - this is the runner responsible for orchestrating WIX dependencies.
 
 `Weasel` will attempt to create the desired output directory and begin to run WIX tools to discover, compile and output the relevant artifacts required to install the application. `Weasel` requires a specification to describe the application you're packaging to WIX. This comes in XML form:
 
 ```xml
-<NETWeasel>
+<NETWeasel version="1">
     <Specification>
       <ProductName>
         My Application
